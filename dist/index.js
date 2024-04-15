@@ -32153,17 +32153,11 @@ function isValidReport(report) {
 }
 exports.isValidReport = isValidReport;
 function parseReport(data) {
-    let report;
-    try {
-        report = JSON.parse(data);
-        if (!isValidReport(report)) {
-            (0, core_1.debug)('Invalid report file');
-            (0, core_1.debug)(data);
-            throw new Error('Invalid JSON report file');
-        }
-    }
-    catch (error) {
-        throw error;
+    const report = JSON.parse(data);
+    if (!isValidReport(report)) {
+        (0, core_1.debug)('Invalid report file');
+        (0, core_1.debug)(data);
+        throw new Error('Invalid JSON report file');
     }
     const files = report.suites.map((file) => file.title);
     const suites = report.suites.flatMap((file) => file.suites?.length ? [...file.suites.map((suite) => `${file.title} > ${suite.title}`)] : [file.title]);
