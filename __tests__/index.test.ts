@@ -16,7 +16,8 @@ const debugMock = jest.spyOn(core, 'debug').mockImplementation(jest.fn())
 //const infoMock = jest.spyOn(core, 'info').mockImplementation(jest.fn())
 //const warningMock = jest.spyOn(core, 'warning').mockImplementation(jest.fn())
 //const errorMock = jest.spyOn(core, 'error').mockImplementation(jest.fn())
-// const getInputMock = jest.spyOn(core, 'getInput').mockImplementation((name: string) => inputs[name] || '')
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getInputMock = jest.spyOn(core, 'getInput').mockImplementation((name: string) => inputs[name] || '')
 const setFailedMock = jest.spyOn(core, 'setFailed')
 const setOutputMock = jest.spyOn(core, 'setOutput')
 
@@ -33,6 +34,10 @@ const runMock = jest.spyOn(index, 'run')
 // Shallow clone original @actions/github context
 // @ts-expect-error missing issue and repo keys
 const originalContext: Context = { issue: {}, ...github.context }
+
+// Inputs for mock @actions/core
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+let inputs: Record<string, string> = {}
 
 function setContext(context: Context): void {
 	Object.defineProperty(github, 'context', { value: context, writable: true })
@@ -64,6 +69,11 @@ describe('action', () => {
 	})
 
 	it('sets the comment id output', async () => {
+		inputs = {
+			'report-file': '__tests__/__fixtures__/report-valid.json',
+			'comment-title': 'Custom comment title'
+		}
+
 		const testContext: Context = {
 			...github.context,
 			eventName: 'pull_request',
@@ -94,6 +104,10 @@ describe('action', () => {
 	})
 
 	it('sets a failed status', async () => {
+		inputs = {
+			'report-file': 'file-does-not-exist.json'
+		}
+
 		await index.run()
 		expect(runMock).toHaveReturned()
 
