@@ -99,8 +99,11 @@ describe('action', () => {
 
 		// Verify that all of the core library functions were called correctly
 		expect(debugMock).toHaveBeenNthCalledWith(1, 'Report file: __tests__/__fixtures__/report-valid.json')
-		expect(debugMock).toHaveBeenNthCalledWith(2, 'Comment title: Custom comment title')
-		expect(setOutputMock).toHaveBeenNthCalledWith(1, 'comment-id', expect.anything())
+		expect(debugMock).toHaveBeenNthCalledWith(2, 'Report url: ')
+		expect(debugMock).toHaveBeenNthCalledWith(3, 'Report tag: (none)')
+		expect(debugMock).toHaveBeenNthCalledWith(4, 'Comment title: Custom comment title')
+		expect(setOutputMock).toHaveBeenNthCalledWith(1, 'summary', expect.anything())
+		expect(setOutputMock).toHaveBeenNthCalledWith(2, 'comment-id', expect.anything())
 	})
 
 	it('sets a failed status', async () => {
@@ -112,6 +115,9 @@ describe('action', () => {
 		expect(runMock).toHaveReturned()
 
 		// Verify that all of the core library functions were called correctly
-		expect(setFailedMock).toHaveBeenNthCalledWith(1, 'Failed to find report file at path file-does-not-exist.json')
+		expect(setFailedMock).toHaveBeenNthCalledWith(
+			1,
+			'Report file file-does-not-exist.json not found. Make sure Playwright is configured to generate a JSON report.'
+		)
 	})
 })

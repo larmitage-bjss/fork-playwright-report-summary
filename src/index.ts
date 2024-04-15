@@ -1,7 +1,6 @@
 import path from 'path'
 import {
 	getInput,
-	getBooleanInput,
 	setOutput,
 	setFailed,
 	startGroup,
@@ -42,7 +41,7 @@ export async function report(): Promise<void> {
 	const reportTag = getInput('report-tag') || workflow
 	const commentTitle = getInput('comment-title') || 'Playwright test results'
 	const iconStyle = getInput('icon-style') || 'octicons'
-	const jobSummary = getBooleanInput('job-summary')
+	const jobSummary = getInput('job-summary').toLowerCase() === 'true'
 
 	debug(`Report file: ${reportFile}`)
 	debug(`Report url: ${reportUrl}`)

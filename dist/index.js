@@ -32015,7 +32015,7 @@ async function report() {
     const reportTag = (0, core_1.getInput)('report-tag') || workflow;
     const commentTitle = (0, core_1.getInput)('comment-title') || 'Playwright test results';
     const iconStyle = (0, core_1.getInput)('icon-style') || 'octicons';
-    const jobSummary = (0, core_1.getBooleanInput)('job-summary');
+    const jobSummary = (0, core_1.getInput)('job-summary').toLowerCase() === 'true';
     (0, core_1.debug)(`Report file: ${reportFile}`);
     (0, core_1.debug)(`Report url: ${reportUrl}`);
     (0, core_1.debug)(`Report tag: ${reportTag || '(none)'}`);
