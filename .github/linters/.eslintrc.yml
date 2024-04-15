@@ -13,7 +13,8 @@ ignorePatterns:
   - '**/dist/.*'
   - '**/coverage/.*'
   - '*.json'
-  - '*.md'
+  - 'README.md'
+  - 'dist/**'
   - '.github/workflows/*.yml'
 
 parser: '@typescript-eslint/parser'
