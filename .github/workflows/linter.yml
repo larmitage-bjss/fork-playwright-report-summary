@@ -17,22 +17,18 @@ jobs:
 
     steps:
       - name: Checkout
-        id: checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        id: setup-node
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
 
       - name: Install Dependencies
-        id: install
         run: npm ci
 
       - name: Lint Code Base
-        id: super-linter
         uses: super-linter/super-linter/slim@v5
         env:
           DEFAULT_BRANCH: main

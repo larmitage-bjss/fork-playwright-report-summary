@@ -71,7 +71,8 @@ describe('action', () => {
 	it('sets the comment id output', async () => {
 		inputs = {
 			'report-file': '__tests__/__fixtures__/report-valid.json',
-			'comment-title': 'Custom comment title'
+			'comment-title': 'Custom comment title',
+			'report-tag': 'Custom report tag'
 		}
 
 		const testContext: Context = {
@@ -100,7 +101,7 @@ describe('action', () => {
 		// Verify that all of the core library functions were called correctly
 		expect(debugMock).toHaveBeenNthCalledWith(1, 'Report file: __tests__/__fixtures__/report-valid.json')
 		expect(debugMock).toHaveBeenNthCalledWith(2, 'Report url: ')
-		expect(debugMock).toHaveBeenNthCalledWith(3, 'Report tag: (none)')
+		expect(debugMock).toHaveBeenNthCalledWith(3, 'Report tag: Custom report tag')
 		expect(debugMock).toHaveBeenNthCalledWith(4, 'Comment title: Custom comment title')
 		expect(setOutputMock).toHaveBeenNthCalledWith(1, 'summary', expect.anything())
 		expect(setOutputMock).toHaveBeenNthCalledWith(2, 'comment-id', expect.anything())
