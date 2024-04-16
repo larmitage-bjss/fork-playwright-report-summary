@@ -54,15 +54,15 @@ export async function report(): Promise<void> {
 	if (eventName === 'push') {
 		ref = payload.ref
 		sha = payload.after
-		console.log(`Commit pushed onto ${ref} (${sha})`)
+		debug(`Commit pushed onto ${ref} (${sha})`)
 	} else if (eventName === 'pull_request' || eventName === 'pull_request_target') {
 		ref = payload.pull_request?.base?.ref
 		sha = payload.pull_request?.head?.sha
-		console.log(`PR #${pull_number} targeting ${ref} (${sha})`)
+		debug(`PR #${pull_number} targeting ${ref} (${sha})`)
 	} else if (eventName === 'workflow_dispatch') {
-		console.log(`Workflow dispatched on ${ref} (${sha})`)
+		debug(`Workflow dispatched on ${ref} (${sha})`)
 	} else {
-		console.warn(`Unsupported event type: ${eventName}`)
+		debug(`Unsupported event type: ${eventName}`)
 	}
 
 	const reportPath = path.resolve(cwd, reportFile)
@@ -92,7 +92,7 @@ export async function report(): Promise<void> {
 	const hasPR = eventName === 'pull_request' || eventName === 'pull_request_target'
 
 	if (!hasPR) {
-		console.log('No PR associated with this action run. Not posting a check or comment.')
+		debug('No PR associated with this action run. Not posting a check or comment.')
 	} else {
 		startGroup(`Commenting test report on PR`)
 		try {
@@ -107,14 +107,14 @@ export async function report(): Promise<void> {
 		}
 
 		if (commentId) {
-			console.log(`Found previous comment #${commentId}`)
+			debug(`Found previous comment #${commentId}`)
 			try {
 				await octokit.rest.issues.updateComment({
 					...repo,
 					comment_id: commentId,
 					body
 				})
-				console.log(`Updated previous comment #${commentId}`)
+				debug(`Updated previous comment #${commentId}`)
 			} catch (error: unknown) {
 				console.error(`Error updating previous comment: ${(error as Error).message}`)
 				commentId = null
@@ -122,7 +122,7 @@ export async function report(): Promise<void> {
 		}
 
 		if (!commentId) {
-			console.log('Creating new comment')
+			debug('Creating new comment')
 			try {
 				const { data: newComment } = await octokit.rest.issues.createComment({
 					...repo,
@@ -130,10 +130,10 @@ export async function report(): Promise<void> {
 					body
 				})
 				commentId = newComment.id
-				console.log(`Created new comment #${commentId}`)
+				debug(`Created new comment #${commentId}`)
 			} catch (error: unknown) {
 				console.error(`Error creating comment: ${(error as Error).message}`)
-				console.log(`Submitting PR review comment instead...`)
+				debug(`Submitting PR review comment instead...`)
 				try {
 					const { issue } = context
 					await octokit.rest.pulls.createReview({

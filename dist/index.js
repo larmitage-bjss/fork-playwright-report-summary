@@ -32025,18 +32025,18 @@ async function report() {
     if (eventName === 'push') {
         ref = payload.ref;
         sha = payload.after;
-        console.log(`Commit pushed onto ${ref} (${sha})`);
+        (0, core_1.debug)(`Commit pushed onto ${ref} (${sha})`);
     }
     else if (eventName === 'pull_request' || eventName === 'pull_request_target') {
         ref = payload.pull_request?.base?.ref;
         sha = payload.pull_request?.head?.sha;
-        console.log(`PR #${pull_number} targeting ${ref} (${sha})`);
+        (0, core_1.debug)(`PR #${pull_number} targeting ${ref} (${sha})`);
     }
     else if (eventName === 'workflow_dispatch') {
-        console.log(`Workflow dispatched on ${ref} (${sha})`);
+        (0, core_1.debug)(`Workflow dispatched on ${ref} (${sha})`);
     }
     else {
-        console.warn(`Unsupported event type: ${eventName}`);
+        (0, core_1.debug)(`Unsupported event type: ${eventName}`);
     }
     const reportPath = path_1.default.resolve(cwd, reportFile);
     const reportExists = await (0, fs_1.fileExists)(reportPath);
@@ -32058,7 +32058,7 @@ async function report() {
     const octokit = (0, github_1.getOctokit)(token);
     const hasPR = eventName === 'pull_request' || eventName === 'pull_request_target';
     if (!hasPR) {
-        console.log('No PR associated with this action run. Not posting a check or comment.');
+        (0, core_1.debug)('No PR associated with this action run. Not posting a check or comment.');
     }
     else {
         (0, core_1.startGroup)(`Commenting test report on PR`);
@@ -32074,14 +32074,14 @@ async function report() {
             console.error(`Error fetching existing comments: ${error.message}`);
         }
         if (commentId) {
-            console.log(`Found previous comment #${commentId}`);
+            (0, core_1.debug)(`Found previous comment #${commentId}`);
             try {
                 await octokit.rest.issues.updateComment({
                     ...repo,
                     comment_id: commentId,
                     body
                 });
-                console.log(`Updated previous comment #${commentId}`);
+                (0, core_1.debug)(`Updated previous comment #${commentId}`);
             }
             catch (error) {
                 console.error(`Error updating previous comment: ${error.message}`);
@@ -32089,7 +32089,7 @@ async function report() {
             }
         }
         if (!commentId) {
-            console.log('Creating new comment');
+            (0, core_1.debug)('Creating new comment');
             try {
                 const { data: newComment } = await octokit.rest.issues.createComment({
                     ...repo,
@@ -32097,11 +32097,11 @@ async function report() {
                     body
                 });
                 commentId = newComment.id;
-                console.log(`Created new comment #${commentId}`);
+                (0, core_1.debug)(`Created new comment #${commentId}`);
             }
             catch (error) {
                 console.error(`Error creating comment: ${error.message}`);
-                console.log(`Submitting PR review comment instead...`);
+                (0, core_1.debug)(`Submitting PR review comment instead...`);
                 try {
                     const { issue } = github_1.context;
                     await octokit.rest.pulls.createReview({

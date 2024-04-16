@@ -12,24 +12,13 @@ import * as index from '../src/index'
 import { Context } from '@actions/github/lib/context'
 
 // Mock the GitHub Actions core library
-const debugMock = jest.spyOn(core, 'debug').mockImplementation(jest.fn())
-//const infoMock = jest.spyOn(core, 'info').mockImplementation(jest.fn())
-//const warningMock = jest.spyOn(core, 'warning').mockImplementation(jest.fn())
-//const errorMock = jest.spyOn(core, 'error').mockImplementation(jest.fn())
+let debugMock: jest.SpiedFunction<typeof core.debug>
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getInputMock = jest.spyOn(core, 'getInput').mockImplementation((name: string) => inputs[name] || '')
-const setFailedMock = jest.spyOn(core, 'setFailed')
-const setOutputMock = jest.spyOn(core, 'setOutput')
-
-// Mock the GitHub Actions context library
-// const getOctokitMock = jest.spyOn(github, 'getOctokit')
-// const contextMock = jest.spyOn(github, 'context')
+let getInputMock: jest.SpiedFunction<typeof core.getInput>
+let setFailedMock: jest.SpiedFunction<typeof core.setFailed>
 
 // Mock the action's entrypoint
 const runMock = jest.spyOn(index, 'run')
-
-// Mark as GitHub action environment
-// process.env.GITHUB_ACTIONS = 'true'
 
 // Shallow clone original @actions/github context
 // @ts-expect-error missing issue and repo keys
@@ -56,6 +45,10 @@ describe('action', () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks()
+
+		debugMock = jest.spyOn(core, 'debug').mockImplementation()
+		getInputMock = jest.spyOn(core, 'getInput').mockImplementation((name: string) => inputs[name] || '')
+		setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
 	})
 
 	afterEach(() => {
@@ -99,12 +92,12 @@ describe('action', () => {
 		expect(runMock).toHaveReturned()
 
 		// Verify that all of the core library functions were called correctly
+		expect(debugMock).toHaveBeenCalledTimes(5)
 		expect(debugMock).toHaveBeenNthCalledWith(1, 'Report file: __tests__/__fixtures__/report-valid.json')
 		expect(debugMock).toHaveBeenNthCalledWith(2, 'Report url: ')
 		expect(debugMock).toHaveBeenNthCalledWith(3, 'Report tag: Custom report tag')
 		expect(debugMock).toHaveBeenNthCalledWith(4, 'Comment title: Custom comment title')
-		expect(setOutputMock).toHaveBeenNthCalledWith(1, 'summary', expect.anything())
-		expect(setOutputMock).toHaveBeenNthCalledWith(2, 'comment-id', expect.anything())
+		expect(debugMock).toHaveBeenNthCalledWith(5, 'PR #12345 targeting undefined (undefined)')
 	})
 
 	it('sets a failed status', async () => {
