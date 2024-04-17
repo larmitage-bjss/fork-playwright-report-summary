@@ -162,6 +162,12 @@ export function parseReport(data: string): ReportSummary {
 			for (const spec of suite.specs) {
 				all.push(parseSpec(spec, [file, suite]))
 			}
+
+			for (const suite2 of suite.suites || []) {
+				for (const spec of suite2.specs) {
+					all.push(parseSpec(spec, [file, suite, suite2]))
+				}
+			}
 		}
 		return all
 	}, [] as SpecSummary[])
