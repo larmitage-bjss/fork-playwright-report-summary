@@ -32152,6 +32152,19 @@ function isValidReport(report) {
     return report !== null && typeof report === 'object' && 'config' in report && 'errors' in report && 'suites' in report;
 }
 exports.isValidReport = isValidReport;
+function parseSpecsRecursively(all, suites, parents = []) {
+    for (const suite of suites) {
+        if (suite.specs.length > 0) {
+            for (const spec of suite.specs) {
+                all.push(parseSpec(spec, [...parents, suite]));
+            }
+            if (suite.suites.length > 0) {
+                all = parseSpecsRecursively(all, suite.suites, [...parents, suite]);
+            }
+        }
+    }
+    return all;
+}
 function parseReport(data) {
     const report = JSON.parse(data);
     if (!isValidReport(report)) {
@@ -32161,17 +32174,7 @@ function parseReport(data) {
     }
     const files = report.suites.map((file) => file.title);
     const suites = report.suites.flatMap((file) => file.suites?.length ? [...file.suites.map((suite) => `${file.title} > ${suite.title}`)] : [file.title]);
-    const specs = report.suites.reduce((all, file) => {
-        for (const spec of file.specs) {
-            all.push(parseSpec(spec, [file]));
-        }
-        for (const suite of file.suites || []) {
-            for (const spec of suite.specs) {
-                all.push(parseSpec(spec, [file, suite]));
-            }
-        }
-        return all;
-    }, []);
+    const specs = report.suites.reduce((all, file) => parseSpecsRecursively(all, [file]), []);
     const tests = specs.flatMap((spec) => spec.tests);
     const results = tests.flatMap((test) => test.results);
     const failed = tests.filter((test) => test.failed);

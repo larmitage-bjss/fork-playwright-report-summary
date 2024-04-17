@@ -137,6 +137,22 @@ export function isValidReport(report: unknown): report is JSONReport {
 	return report !== null && typeof report === 'object' && 'config' in report && 'errors' in report && 'suites' in report
 }
 
+export function parseSpecsRecursively(all: SpecSummary[], suites: any[], parents: string[] = []): SpecSummary[] {
+	for (const suite of suites) {
+		if (suite.specs.length > 0) {
+			for (const spec of suite.specs) {
+				all.push(parseSpec(spec, [...parents, suite]))
+			}
+
+			if (suite.suites.length > 0) {
+				all = parseSpecsRecursively(all, suite.suites, [...parents, suite])
+			}
+		}
+	}
+
+	return all
+}
+
 export function parseReport(data: string): ReportSummary {
 	const report = JSON.parse(data)
 	if (!isValidReport(report)) {
@@ -149,17 +165,10 @@ export function parseReport(data: string): ReportSummary {
 	const suites: string[] = report.suites.flatMap((file) =>
 		file.suites?.length ? [...file.suites.map((suite) => `${file.title} > ${suite.title}`)] : [file.title]
 	)
-	const specs: SpecSummary[] = report.suites.reduce((all, file) => {
-		for (const spec of file.specs) {
-			all.push(parseSpec(spec, [file]))
-		}
-		for (const suite of file.suites || []) {
-			for (const spec of suite.specs) {
-				all.push(parseSpec(spec, [file, suite]))
-			}
-		}
-		return all
-	}, [] as SpecSummary[])
+	const specs: SpecSummary[] = report.suites.reduce(
+		(all, file) => parseSpecsRecursively(all, [file]),
+		[] as SpecSummary[]
+	)
 	const tests = specs.flatMap((spec) => spec.tests)
 	const results = tests.flatMap((test) => test.results)
 	const failed = tests.filter((test) => test.failed)
